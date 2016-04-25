@@ -2,7 +2,7 @@
 #include <openssl/rand.h>
 #include <strings.h>
 #include <openssl/md5.h>
-#include <sodium.h>
+//#include "sodium.h"
 #include "local.h"
 #include "table.h"
 #include "encrypt.h"
@@ -75,18 +75,18 @@ void cipher_update(struct encryption_ctx *ctx, unsigned char *out, size_t *outle
     if (ctx->cipher == CIPHER_OPENSSL) {
         EVP_CipherUpdate(ctx->ctx, out, (int *) outlen, in, inlen);
     } else if (ctx->cipher == CIPHER_SODIUM) {
-        size_t padding = ctx->bytes_remaining;
-        memcpy(sodium_buf + padding, in, inlen);
-        if (_method == ENCRYPTION_SALSA20) {
-            crypto_stream_salsa20_xor_ic(sodium_buf, sodium_buf, padding + inlen, ctx->iv, ctx->ic, _key);
-        } else if (_method == ENCRYPTION_CHACHA20) {
-            crypto_stream_chacha20_xor_ic(sodium_buf, sodium_buf, padding + inlen, ctx->iv, ctx->ic, _key);
-        }
-        *outlen = inlen;
-        memcpy(out, sodium_buf + padding, inlen);
-        padding += inlen;
-        ctx->ic += padding / SODIUM_BLOCK_SIZE;
-        ctx->bytes_remaining = padding % SODIUM_BLOCK_SIZE;
+//        size_t padding = ctx->bytes_remaining;
+//        memcpy(sodium_buf + padding, in, inlen);
+//        if (_method == ENCRYPTION_SALSA20) {
+//            crypto_stream_salsa20_xor_ic(sodium_buf, sodium_buf, padding + inlen, ctx->iv, ctx->ic, _key);
+//        } else if (_method == ENCRYPTION_CHACHA20) {
+//            crypto_stream_chacha20_xor_ic(sodium_buf, sodium_buf, padding + inlen, ctx->iv, ctx->ic, _key);
+//        }
+//        *outlen = inlen;
+//        memcpy(out, sodium_buf + padding, inlen);
+//        padding += inlen;
+//        ctx->ic += padding / SODIUM_BLOCK_SIZE;
+//        ctx->bytes_remaining = padding % SODIUM_BLOCK_SIZE;
     }
 }
 
@@ -202,7 +202,7 @@ void cleanup_encryption(struct encryption_ctx *ctx) {
 
 void config_encryption(const char *password, const char *method) {
     SSLeay_add_all_algorithms();
-    sodium_init();
+//    sodium_init();
     _method = encryption_method_from_string(method);
     if (_method == ENCRYPTION_TABLE) {
         get_table((unsigned char *) password);
